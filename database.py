@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import sys
+
 class Database(object):
     """Class storing the informations about one database
     such as the name login and password.Database will be the name used to refer
@@ -18,17 +19,42 @@ class Database(object):
                  Login : {}
                  Password : {} """.format(self.host,self.db,self.user,"*" * len(self.passsword))
 
-    def parse_json(json):
+    @classmethod
+    def parse_json(klass,json):
+        """Check existence of required field and send them to create"""
+        h = dict()
+        if "host" not in json:
+            print("Host is not specified in database part",file=sys.stderr)
+            return None
+        h["host"] = json["host"]
+        if "database" not in json:
+            print("Database name is not specified in database part",file=sys.stderr)
+            return None
+        h["database"] = json["database"]
+        if "user" not in json:
+            print("User name is not specified in database part",file =sys.stderr)
+            return None
+        h["user"] = json["user"]
+        if "password" not in json:
+            print("Password is not specified in database part",file=sys.stderr)
+            return None
+        h["password"] = json["password"]
+        if "type" not in json:
+            print("Type of database not specified in database part",file=sys.stderr)
+            return None
+        h["db_type"] = json["type"]
+        return Database.create(**h)
         
 
-    @staticmethod
+    @classmethod
     def create(db_type="mysql",host=None,database=None,user=None,password=None):
         """ Factory method to create a database holder which can be used
         to execute multiple queries"""
         if db_type == "mysql":
             return MysqlDatabase(host,database,user,password)
         else:
-            sys.stderr.print("Unknown type of database." % db_type)
+            print("Unknown type of database {0}.".format(db_type),file=sys.stderr)
+            return None
 
 
 import mysql.connector 

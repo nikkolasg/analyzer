@@ -5,103 +5,183 @@ import json
 import sys
 
 ## custom import
-import database
-import table
-import source
-
+from database import Database
+from analysis import Analysis
+from table import Table
+from source import Source
 from algorithm import *
+
 class Config(object):
     """Class that handles the parsing of the config file 
     and that store the differents structures,i.e. store all sources
     objects defined, all analysis objects etc """
-    file_name = file_name
-    tables = dict
-    analysis = dict
-    database = dict
-    sources = dict
+    CONF_FILE = "config.json"
+    tables = dict()
+    analysis = dict()
+    databases = dict()
+    sources = dict()
 
 
     @classmethod
-    def parse(klass,file_name):
+    def parse_file(klass,file_name):
         """Parse the config file. """
         json = None
-        ## could do exception handling here, but is better at upper level (orchestrator)
-        with open(file_name,"r") as file:
-            json = json.load(file)
+        try:
+            with open(file_name,"r") as file:
+                json = json.load(file)
+        except IOError as e:
+            print("Error while reading config file : {0}".format(e),file=sys.stderr)
+            raise e
+        else:
+            return Config.parse_json(json)
 
-        interpret_json(json)
 
     @classmethod
-    def interpret_json json
+    def parse_json(self,json):
+        """ parse a json. either coming from a file or directly built"""
+        if len(json) == 0: 
+            print("Nothing in the json...")
+            return 
+        return self.interpret_json(json)
+
+    @classmethod
+    def interpret_json(self,json):
         """Will iterate through the json and will instanciate
-        every objects it recognizes. will left out entries it does not know about"""
+        every objects it recognizes. 
+        will left out entries it does not know about and return False is there has
+        been an error. otherwise return True"""
+        noerr = True 
         for type,subjson in json.items():
             if type == "databases":
-                Config.handle_databases(subjson)
+                noerr = noerr and self.handle_databases(subjson)
             elif type == "tables":
-                Config.handle_tables(subjson)
+                noerr = noerr and self.handle_tables(subjson)
             elif type == "analysis":
-                Config.handle_analysis(subjson)
+                noerr = noerr and self.handle_analysis(subjson)
             elif type == "sources":
-                Config.handle_sources(subjson)
+                noerr = noerr and self.handle_sources(subjson)
             else:
-                print("Type {} not recongnized.Skip." % type,file=sys.stderr)
+                print("Type {} not recongnized.Skip.".format(type),file=sys.stderr)
+        return noerr
 
     @classmethod
-    def handle_databases(subjson):
+    def handle_databases(self,subjson):
+        noerr = True
         for descr in subjson:
             d = Database.parse_json(descr)
-            if d: databases[d.name] = d
+            if d is not None: 
+                self.databases[d.name] = d
+            else:
+                noerr = False
+        return noerr
+                
 
     @classmethod
-    def handle_tables(subjson):
+    def handle_tables(self,subjson):
         """ Parse and instantiate the table objects. It also link the database
         part of the table to the instance"""
+        noerr = True
         for descr in subjson:
             t = Table.parse_json(descr)
-            if not t: next
-            if t.database not in databases: 
+            if t is None: 
+                noerr = False
+                continue
+            if t.database not in self.databases: 
                 print("Database info for table % is not known.Please specify before")
-                next
-            t.database = databases[t.databases]
-            tables[t.name] = t
+                noerr = False
+                continue
+            t.database = self.databases[t.database]
+            self.tables[t.name] = t
+
+        return noerr
              
 
-    @classmethd
-    def handle_analysis(subjson):
+    @classmethod
+    def handle_analysis(self,subjson):
         """Parse and instantiate the analysis object. It also link the
         source part & algorithm part"""
+        noerr = True
         for descr in subjson:
             a = Analysis.parse_json(descr)
-            if not a: next
+            if a is None:
+                noerr = False
+                continue
             snames = a.sources
             a.sources = []
             for source_name in snames:
-                if source_name not in sources:
-                    print("Source {} specified in analysis {} does not correspond to anything.Skip.",% source_name,file=sys.stderr)
-                    next
-                a.sources.append(sources[source_name])
+                if source_name not in self.sources:
+                    print("Source {} specified in analysis {} does not correspond to anything.Skip.".format(source_name,a.name),file=sys.stderr)
+                    noerr = False
+                    continue
+                a.sources.append(self.sources[source_name])
 
             if a.algorithm not in globals():
-                print("Algorithm {} not recognized. Please lookup in algorithm/__init__.py to see if you import it well" % a.algorithm,file=sys.stderr)
-                next
+                noerr = False
+                print("Algorithm {} not recognized. Please lookup in algorithm/__init__.py to see if you import it well".format(a.algorithm),file=sys.stderr)
+                continue
             ## instantiate the class
             a.algorithm = globals()[a.algorithm](a.options)
+            self.analysis[a.name] = a
+        return noerr
 
-    def handle_sources(subjson):
+    @classmethod
+    def handle_sources(self,subjson):
         """ Parse and instanciate sources object with object references linked"""
+        noerr = True
         for descr in subjson:
             s = Source.parse_json(descr)
-            if not s: next
-            if s.table not in tables:
-                print("Table {} not recognized in the source {} in configuration." % (s.table,s.name),file=sys.stderr)
-                next
-            sources[s.name] = s
+            if s is None: 
+                noerr = False
+                continue
+            if s.table not in self.tables:
+                noerr = False
+                print("Table {} not recognized in the source {} in configuration.".format(s.table,s.name),file=sys.stderr)
+                continue
+            self.sources[s.name] = s
+        return noerr
 
 
-                    
+import unittest
+
+class ConfigTest(unittest.TestCase):
+
+    def test_parse_nonexistent_file(self):
+        file_name = "non_exist"
+        self.assertRaises(FileNotFoundError,Config.parse_file,file_name)
+
+    def test_parse_empty_json(self):
+        json = dict()
+        self.assertIsNone(Config.parse_json(json))
+
+    def test_parse_good_json(self):
+        json = {
+                "databases" : [
+                    { "host":"127.0.0.1",
+                      "database":"EMM",
+                      "user":"emm_op",
+                      "password":"888"} ],
+                "tables" : [
+                    { "name": "MSS",
+                      "table_name": "MON_MSS_STATS",
+                      "time_field": "timest",
+                      "fields":["type"],
+                      "database":"EMM"}
+                    ],
+                "sources": [
+                    { "name": "mss_onnet",
+                      "table": "MSS",
+                      "where_clause": "source = 5 AND type = 8" } ],
+                 "analysis" : [
+                     { "name": "moving average",
+                       "sources": "mss_onnet",
+                       "window":"10",
+                       "slice":"5",
+                       "algorithm":"Generic"
+                       } ]
+              }
+        self.assertTrue(Config.parse_json(json))
 
 
 
-
-
+if __name__ == '__main__':
+    unittest.main()
