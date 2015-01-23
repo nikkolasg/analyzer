@@ -18,8 +18,7 @@ class Database(object):
                  Database : {}
                  Login : {}
                  Password : {} """.format(self.host,self.db,self.user,"*" * len(self.passsword))
-
-    @classmethod
+   @classmethod
     def parse_json(klass,json):
         """Check existence of required field and send them to create"""
         h = dict()
@@ -33,6 +32,7 @@ class Database(object):
         h["database"] = json["database"]
         if "user" not in json:
             log.warning("User name is not specified in database part",file =sys.stderr)
+        "table_name": "MON_MSS_STATS",
             return None
         h["user"] = json["user"]
         if "password" not in json:
@@ -67,35 +67,56 @@ class MysqlDatabase(Database):
         Database.__init__(self,host,database,user,password)
         self.cursor = None
         self.connection = None
-
-    def __enter__(self):
-        """ context manager to autmatically close the connection after use
-        Can be use like with Database.create(config) as sql:
-        or in a variable but dont forger to call __exit__ after"""
+    
+    @contextlib.contextmanager
+    def connect(self):
         try:
-           self.connection = mysql.connector.connect(host=self.host,
-                    database=self.database,
-                    user=self.user,
-                    password=self.password)
-           self.cursor = self.connection.cursor()
-           log.info("Connection to the Mysql database created !")
-           return self.cursor
+            self.cnx = mysql.connector.connect(user=self.user,
+                database=self.db,
+                host=self.host,
+                password=self.pwd)
+            log.debug("Connection to database opened")
+            yield self.cnx
         except mysql.connector.Error as err:
-           if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-               log.error("Something is wrong with your user name or password")
-           elif err.errno == errorcode.ER_BAD_DB_ERROR:
-               log.error("Database does not exists")
-           else :
-               log.error(err)
-           self.__exit__()
+            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+                log.error("Something is wrong with your user name or password")
+            elif err.errno == errorcode.ER_BAD_DB_ERROR:
+                log.error("Database does not exists")
+        except Exception as e:
+            log.error(str(e))
+        else:
+            self.cnx.close()
+            log.debug("Closed connection ..")
+        return
+  
+   # def __enter__(self):
+        #""" context manager to autmatically close the connection after use
+        #Can be use like with Database.create(config) as sql:
+        #or in a variable but dont forger to call __exit__ after"""
+        #try:
+           #self.connection = mysql.connector.connect(host=self.host,
+                    #database=self.database,
+                    #user=self.user,
+                    #password=self.password)
+           #self.cursor = self.connection.cursor()
+           #log.info("Connection to the Mysql database created !")
+           #return self.cursor
+        #except mysql.connector.Error as err:
+           #if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+               #log.error("Something is wrong with your user name or password")
+           #elif err.errno == errorcode.ER_BAD_DB_ERROR:
+               #log.error("Database does not exists")
+           #else :
+               #log.error(err)
+           #self.__exit__()
 
-    def __exit__(self,*args):
-        """ Close the connection to the db"""
-        if self.cursor: self.cursor.close()
-        if self.connection: self.connection.close()
-        self.cursor = None
-        self.connection = None
-        log.info("Connection to the Mysql database closed ...")
+    #def __exit__(self,*args):
+        #""" Close the connection to the db"""
+        #if self.cursor: self.cursor.close()
+        #if self.connection: self.connection.close()
+        #self.cursor = None
+        #self.connection = None
+        #log.info("Connection to the Mysql database closed ...")
 
 
 import unittest

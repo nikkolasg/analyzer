@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import unittest
 import sys
+import logging as log
 class Table:
     """This class contains infos about the definition of a table_name
     where to fetch the data. Essentially you must specify some fields.
