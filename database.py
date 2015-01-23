@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sys
 import logging as log
+
 class Database(object):
     """Class storing the informations about one database
     such as the name login and password.Database will be the name used to refer
@@ -18,7 +19,7 @@ class Database(object):
                  Database : {}
                  Login : {}
                  Password : {} """.format(self.host,self.db,self.user,"*" * len(self.passsword))
-   @classmethod
+    @classmethod
     def parse_json(klass,json):
         """Check existence of required field and send them to create"""
         h = dict()
@@ -31,8 +32,7 @@ class Database(object):
             return None
         h["database"] = json["database"]
         if "user" not in json:
-            log.warning("User name is not specified in database part",file =sys.stderr)
-        "table_name": "MON_MSS_STATS",
+            log.warning("User name is not specified in database part")
             return None
         h["user"] = json["user"]
         if "password" not in json:
@@ -59,6 +59,7 @@ class Database(object):
 
 import mysql.connector 
 from mysql.connector import errorcode
+import contextlib
 
 class MysqlDatabase(Database):
     """implementation of Sql database"""
