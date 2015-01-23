@@ -8,12 +8,13 @@ class Table:
     The table here must be in the format :
     timestamp, type1 (type2, etc), counter1, (counter 2, etc) """
 
-    def __init__(self,name,table_name,database,time_field,fields):
+    def __init__(self,name,table_name,database,time_field,fields,counter="counter"):
         self.time_field = time_field
         self.fields = fields
         self.table_name = table_name
         self.name = name
         self.database = database
+        self.counter = counter
     
     @classmethod
     def parse_json(self,json):
@@ -45,7 +46,8 @@ class Table:
             log.warning("No database field present in the table json part")
             return None
         database = json["database"]
-        return Table(name,table_name,database,time_field,fields)
+        counter = json["counter"] if "counter" in json else "counter"
+        return Table(name,table_name,database,time_field,fields,counter)
 
 
     def __str__(self):

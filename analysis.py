@@ -9,12 +9,14 @@ class Analysis:
     with some conditions (for now Sql where clause statements)
     and an algorithm name, followed by options for this algorithm"""
 
-    def __init__(self,name,sources,algorithm,window,slice,opts = {}):
+    def __init__(self,name,sources,algorithm,period,nb_periods,slice,window=1,opts = {}):
         self.name = name
         self.sources = sources
         self.algorithm = algorithm
-        self.window = window
         self.slice = slice
+        self.period = 
+        self.nb_periods = 
+        self.window = window
         ## options for the algorithm
         self.options = opts
 
@@ -39,18 +41,32 @@ class Analysis:
         algorithm = json["algorithm"]
         del json["algorithm"]
 
-        if "window" not in json:
-            log.warning("No window size specified in analysis part of json")
+        if "period" not in json:
+            log.warning("No period size specified in analysis part of json")
             return None
-        window = json["window"]
+        window = json["period"]
+        del json["period"]
+
+        if "nb_periods" not in json:
+            log.warning("No nb_periods size specified in analysis part of json")
+            return None
+        nb_periods = json["nb_periods"]
+        del json["nb_periods"]
 
         if "slice" not in json:
             log.warning("No slice size specified in analysis part of json")
             return None
         slice = json["slice"]
+        del json["slice"]
+
+        if "window" in json:
+            window = json["window"]
+            del json["window"]
+        else:
+            window = 1
         options = json.copy()
 
-        return Analysis(name,sources,algorithm,window,slice,options)
+        return Analysis(name,sources,algorithm,period,nb_periods,slice,window,options)
         
 
 

@@ -4,14 +4,8 @@ import argparse
 import logging as log
 from config import Config
 import constants as c
+from parser import args
 
-DEFAULT_CONF_FILE = "config.json"
-
-parser = argparse.ArgumentParser()
-parser.add_argument("-v","--verbosity",help="verbosity level. Specify -v,-vv,-vvv for different lelvel of verbosity",action="count",default=c.DEFAULT_VERBOSE_LEVEL)
-    ## TODO
-parser.add_argument("-c","--config",help="specify a config file.Default is config.json",type=str,default=c.DEFAULT_CONF_FILE)
-args = parser.parse_args()
 
 def setup_logging():
     """Setup the different logging handlers etc"""

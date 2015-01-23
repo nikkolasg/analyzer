@@ -19,8 +19,10 @@
         "analysis" : [
         { "name": "moving_average",
             "sources": "mss_onnet",
-            "window":"10",
+            "window":"1",
             "slice":"5",
+            "period":604800,
+            "nb_periods":3, 
             "algorithm":"Generic"
         } ]
 }

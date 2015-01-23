@@ -2,7 +2,7 @@ import sys
 import logging as log
 class Source:
     """This class is used to represent a source,i.e. data in a table, filtered
-    by somes clauses and only for certain fields. It takes a name (just for simplicity),table name,a where_clause, and a fields clause."""
+    by somes clauses and only for certain fields. It takes a name (just for simplicity),table name,a where_clause"""
     def __init__(self,name,table,where_clause):
         self.name = name
         self.table = table

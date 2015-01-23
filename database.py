@@ -83,8 +83,10 @@ class MysqlDatabase(Database):
                 log.error("Something is wrong with your user name or password")
             elif err.errno == errorcode.ER_BAD_DB_ERROR:
                 log.error("Database does not exists")
+                raise err
         except Exception as e:
             log.error(str(e))
+            raise e
         else:
             self.cnx.close()
             log.debug("Closed connection ..")
