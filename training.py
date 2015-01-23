@@ -33,6 +33,16 @@ class MySqlDatabase:
         return
 
 s = MySqlDatabase("EMM","127.0.0.1","emm_op","em8")
-with s.connect() as cur:
-    print("Inside loop !")
+#with s.connect() as cur:
+    #print("Inside loop !")
+
+def func_keywords(a="aaa",b="bbb",c="ccc"):
+    print("a = {}, b = {}, c = {}".format(a,b,c))
+
+json = {
+        "a" : "nopeA",
+        "b" : "nopeB"
+        }
+func_keywords(**json)
+func_keywords(a="insidecall")
 

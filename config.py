@@ -51,17 +51,18 @@ class Config(object):
         will left out entries it does not know about and return False is there has
         been an error. otherwise return True"""
         noerr = True 
-        for type,subjson in json.items():
-            if type == "databases":
-                noerr = noerr and self.handle_databases(subjson)
-            elif type == "tables":
-                noerr = noerr and self.handle_tables(subjson)
-            elif type == "analysis":
-                noerr = noerr and self.handle_analysis(subjson)
-            elif type == "sources":
-                noerr = noerr and self.handle_sources(subjson)
-            else:
-                print("Type {} not recongnized.Skip.".format(type),file=sys.stderr)
+        if "databases" in json:
+            noerr = noerr and self.handle_databases(json["databases"])
+            print("Databases dict : {}".format(self.databases))
+        if "tables" in json:
+            noerr = noerr and self.handle_tables(json["tables"])
+            print("Tables dict : {}".format(self.tables))
+        if "sources" in json:
+            noerr = noerr and self.handle_sources(json["sources"])
+            print("Sources dict : {}".format(self.sources))
+        if "analysis" in json:
+            noerr = noerr and self.handle_analysis(json["analysis"])
+            print("Analysis dict : {}".format(self.analysis))
         return noerr
 
     @classmethod
@@ -74,7 +75,7 @@ class Config(object):
             else:
                 noerr = False
         return noerr
-                
+
 
     @classmethod
     def handle_tables(self,subjson):
@@ -94,7 +95,7 @@ class Config(object):
             self.tables[t.name] = t
 
         return noerr
-             
+
 
     @classmethod
     def handle_analysis(self,subjson):
@@ -157,28 +158,29 @@ class ConfigTest(unittest.TestCase):
         json = {
                 "databases" : [
                     { "host":"127.0.0.1",
-                      "database":"EMM",
-                      "user":"emm_op",
-                      "password":"888"} ],
-                "tables" : [
-                    { "name": "MSS",
-                      "table_name": "MON_MSS_STATS",
-                      "time_field": "timest",
-                      "fields":["type"],
-                      "database":"EMM"}
-                    ],
-                "sources": [
-                    { "name": "mss_onnet",
-                      "table": "MSS",
-                      "where_clause": "source = 5 AND type = 8" } ],
-                 "analysis" : [
-                     { "name": "moving average",
-                       "sources": "mss_onnet",
-                       "window":"10",
-                       "slice":"5",
-                       "algorithm":"Generic"
-                       } ]
-              }
+                        "dbtype":"mysql",
+                        "database":"EMM",
+                        "user":"emm_op",
+                        "password":"888"} ],
+                    "tables" : [
+                        { "name": "MSS",
+                            "table_name": "MON_MSS_STATS",
+                            "time_field": "timest",
+                            "fields":["type"],
+                            "database":"EMM"}
+                        ],
+                    "sources": [
+                        { "name": "mss_onnet",
+                            "table": "MSS",
+                            "where_clause": "source = 5 AND type = 8" } ],
+                        "analysis" : [
+                            { "name": "moving_average",
+                                "sources": "mss_onnet",
+                                "window":"10",
+                                "slice":"5",
+                                "algorithm":"Generic"
+                                } ]
+                            }
         self.assertTrue(Config.parse_json(json))
 
 

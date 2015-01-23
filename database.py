@@ -11,7 +11,7 @@ class Database(object):
         self.database = database
         self.user = user
         self.password = password
-
+        self.name = database
 
     def __str__(self):
         return """Host : {}
@@ -39,21 +39,21 @@ class Database(object):
             print("Password is not specified in database part",file=sys.stderr)
             return None
         h["password"] = json["password"]
-        if "type" not in json:
+        if "dbtype" not in json:
             print("Type of database not specified in database part",file=sys.stderr)
             return None
-        h["db_type"] = json["type"]
+        h["dbtype"] = json["dbtype"]
         return Database.create(**h)
         
 
     @classmethod
-    def create(db_type="mysql",host=None,database=None,user=None,password=None):
+    def create(self,host="",database="",user="",password="",dbtype="mysql"):
         """ Factory method to create a database holder which can be used
         to execute multiple queries"""
-        if db_type == "mysql":
+        if dbtype == "mysql":
             return MysqlDatabase(host,database,user,password)
         else:
-            print("Unknown type of database {0}.".format(db_type),file=sys.stderr)
+            print("Unknown type of database {0}.".format(dbtype),file=sys.stderr)
             return None
 
 
