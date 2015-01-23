@@ -3,6 +3,7 @@
 import os.path
 import json
 import sys
+import logging as log
 
 ## custom import
 from database import Database
@@ -15,7 +16,6 @@ class Config(object):
     """Class that handles the parsing of the config file 
     and that store the differents structures,i.e. store all sources
     objects defined, all analysis objects etc """
-    CONF_FILE = "config.json"
     tables = dict()
     analysis = dict()
     databases = dict()
@@ -25,15 +25,14 @@ class Config(object):
     @classmethod
     def parse_file(klass,file_name):
         """Parse the config file. """
-        json = None
+        json_ = None
         try:
             with open(file_name,"r") as file:
-                json = json.load(file)
+                json_ = json.load(file)
         except IOError as e:
-            print("Error while reading config file : {0}".format(e),file=sys.stderr)
-            raise e
+            log.error("Error while reading config file : {0}".format(e))
         else:
-            return Config.parse_json(json)
+            return Config.parse_json(json_)
 
 
     @classmethod
@@ -53,16 +52,17 @@ class Config(object):
         noerr = True 
         if "databases" in json:
             noerr = noerr and self.handle_databases(json["databases"])
-            print("Databases dict : {}".format(self.databases))
+            log.debug("Databases dict : {}".format(self.databases))
         if "tables" in json:
             noerr = noerr and self.handle_tables(json["tables"])
-            print("Tables dict : {}".format(self.tables))
+            log.debug("Tables dict : {}".format(self.tables))
         if "sources" in json:
             noerr = noerr and self.handle_sources(json["sources"])
-            print("Sources dict : {}".format(self.sources))
+            log.debug("Sources dict : {}".format(self.sources))
         if "analysis" in json:
             noerr = noerr and self.handle_analysis(json["analysis"])
-            print("Analysis dict : {}".format(self.analysis))
+            log.debug("Analysis dict : {}".format(self.analysis))
+        log.info("Config file parsed ... Ok :)")
         return noerr
 
     @classmethod
@@ -88,7 +88,7 @@ class Config(object):
                 noerr = False
                 continue
             if t.database not in self.databases: 
-                print("Database info for table % is not known.Please specify before")
+                log.warning("Database info for table % is not known.Please specify before")
                 noerr = False
                 continue
             t.database = self.databases[t.database]
@@ -111,14 +111,14 @@ class Config(object):
             a.sources = []
             for source_name in snames:
                 if source_name not in self.sources:
-                    print("Source {} specified in analysis {} does not correspond to anything.Skip.".format(source_name,a.name),file=sys.stderr)
+                    log.warning("Source {} specified in analysis {} does not correspond to anything.Skip.".format(source_name,a.name))
                     noerr = False
                     continue
                 a.sources.append(self.sources[source_name])
 
             if a.algorithm not in globals():
                 noerr = False
-                print("Algorithm {} not recognized. Please lookup in algorithm/__init__.py to see if you import it well".format(a.algorithm),file=sys.stderr)
+                log.warning("Algorithm {} not recognized. Please lookup in algorithm/__init__.py to see if you import it well".format(a.algorithm))
                 continue
             ## instantiate the class
             a.algorithm = globals()[a.algorithm](a.options)
@@ -136,7 +136,7 @@ class Config(object):
                 continue
             if s.table not in self.tables:
                 noerr = False
-                print("Table {} not recognized in the source {} in configuration.".format(s.table,s.name),file=sys.stderr)
+                log.warning("Table {} not recognized in the source {} in configuration.".format(s.table,s.name))
                 continue
             self.sources[s.name] = s
         return noerr

@@ -1,4 +1,5 @@
 import sys
+import logging as log
 class Source:
     """This class is used to represent a source,i.e. data in a table, filtered
     by somes clauses and only for certain fields. It takes a name (just for simplicity),table name,a where_clause, and a fields clause."""
@@ -11,12 +12,12 @@ class Source:
     def parse_json(self,json):
         """Read ans set appropriate members of source class"""
         if "name" not in json: 
-            print("Name part is not present in the Source part of json",file=sys.stderr)
+            log.warning("Name part is not present in the Source part of json",file=sys.stderr)
             return None
         name = json["name"]
 
         if "table" not in json:
-            print("Table part is not present in the Source part of json",file=sys.stderr)
+            log.warning("Table part is not present in the Source part of json",file=sys.stderr)
             return None
         table = json["table"]
         

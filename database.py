@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import sys
-
+import logging as log
 class Database(object):
     """Class storing the informations about one database
     such as the name login and password.Database will be the name used to refer
@@ -24,23 +24,23 @@ class Database(object):
         """Check existence of required field and send them to create"""
         h = dict()
         if "host" not in json:
-            print("Host is not specified in database part",file=sys.stderr)
+            log.warning("Host is not specified in database part")
             return None
         h["host"] = json["host"]
         if "database" not in json:
-            print("Database name is not specified in database part",file=sys.stderr)
+            log.warning("Database name is not specified in database part")
             return None
         h["database"] = json["database"]
         if "user" not in json:
-            print("User name is not specified in database part",file =sys.stderr)
+            log.warning("User name is not specified in database part",file =sys.stderr)
             return None
         h["user"] = json["user"]
         if "password" not in json:
-            print("Password is not specified in database part",file=sys.stderr)
+            log.warning("Password is not specified in database part")
             return None
         h["password"] = json["password"]
         if "dbtype" not in json:
-            print("Type of database not specified in database part",file=sys.stderr)
+            log.warning("Type of database not specified in database part")
             return None
         h["dbtype"] = json["dbtype"]
         return Database.create(**h)
@@ -53,7 +53,7 @@ class Database(object):
         if dbtype == "mysql":
             return MysqlDatabase(host,database,user,password)
         else:
-            print("Unknown type of database {0}.".format(dbtype),file=sys.stderr)
+            log.warning("Unknown type of database {0}.".format(dbtype))
             return None
 
 
@@ -78,15 +78,15 @@ class MysqlDatabase(Database):
                     user=self.user,
                     password=self.password)
            self.cursor = self.connection.cursor()
-           print("Connection to the Mysql database created !")
+           log.info("Connection to the Mysql database created !")
            return self.cursor
         except mysql.connector.Error as err:
            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-               print("Something is wrong with your user name or password",file=sys.stderr)
+               log.error("Something is wrong with your user name or password")
            elif err.errno == errorcode.ER_BAD_DB_ERROR:
-               print("Database does not exists",file=sys.stderr)
+               log.error("Database does not exists")
            else :
-               print(err,file=sys.stderr)
+               log.error(err)
            self.__exit__()
 
     def __exit__(self,*args):
@@ -95,7 +95,7 @@ class MysqlDatabase(Database):
         if self.connection: self.connection.close()
         self.cursor = None
         self.connection = None
-        print("Connection to the Mysql database closed ...")
+        log.info("Connection to the Mysql database closed ...")
 
 
 import unittest

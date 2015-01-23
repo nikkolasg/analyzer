@@ -1,6 +1,8 @@
 import sys
+import logging as log
 import util
 class Analysis:
+    global arg
     """ This class is used to describe an analysis we want to make.
     It is generally composed of a name (or id ),a source name (for now, later we may 
     implement a multi source analysis), some fields to analyze,
@@ -22,28 +24,28 @@ class Analysis:
         """Read and set the corresponding members. Raise error if 
         found an aberration, or missing value"""
         if "name" not in json:
-            print("No name specified in analysis part of json",file=sys.stderr)
+            log.warning("No name specified in analysis part of json")
             return None
         name = json["name"]
         if "sources" not in json: 
-            print("No source name specified in analysis part of  json",file=sys.stderr)
+            log.warning("No source name specified in analysis part of  json")
             return None
         sources = util.listize(json["sources"])
         del json["sources"]
 
         if "algorithm" not in json:
-            print("No algorithm specified in analysis part of json",file=sys.stderr)
+            log.warning("No algorithm specified in analysis part of json")
             return None
         algorithm = json["algorithm"]
         del json["algorithm"]
 
         if "window" not in json:
-            print("No window size specified in analysis part of json",file=sys.stderr)
+            log.warning("No window size specified in analysis part of json")
             return None
         window = json["window"]
 
         if "slice" not in json:
-            print("No slice size specified in analysis part of json",file=sys.stderr)
+            log.warning("No slice size specified in analysis part of json")
             return None
         slice = json["slice"]
         options = json.copy()

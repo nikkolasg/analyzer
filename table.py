@@ -21,27 +21,27 @@ class Table:
         or there is not enough data"""
         
         if "name" not in json: 
-            print("No name present in the table json part",file=sys.stderr)
+            log.warning("No name present in the table json part")
             return None
         name = json["name"]
         
         if "table_name" not in json: 
-            print("No table_name present in the table json part",file=sys.stderr)
+            log.warning("No table_name present in the table json part")
             return None
         table_name = json["table_name"]
 
         if "time_field" not in json: 
-            print("No time field present in the table json part",file=sys.stderr)
+            log.warning("No time field present in the table json part")
             return None
         time_field = json["time_field"]
 
         if "fields" not in json: 
-            print("No fields present in the table json part",file=sys.stderr)
+            log.warning("No fields present in the table json part")
             return None
         fields = json["fields"]
 
         if "database" not in json: 
-            print("No database field present in the table json part",file=sys.stderr)
+            log.warning("No database field present in the table json part")
             return None
         database = json["database"]
         return Table(name,table_name,database,time_field,fields)
