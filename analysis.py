@@ -14,8 +14,8 @@ class Analysis:
         self.sources = sources
         self.algorithm = algorithm
         self.slice = slice
-        self.period = 
-        self.nb_periods = 
+        self.period = period 
+        self.nb_periods = nb_periods
         self.window = window
         ## options for the algorithm
         self.options = opts
@@ -44,7 +44,7 @@ class Analysis:
         if "period" not in json:
             log.warning("No period size specified in analysis part of json")
             return None
-        window = json["period"]
+        period = json["period"]
         del json["period"]
 
         if "nb_periods" not in json:

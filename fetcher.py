@@ -2,7 +2,7 @@
 import unittest
 import datetime
 import logging as log
-
+import database
 class Fetcher:
     """This class is responsible for fetching the data out 
     of sources according to certain criterions (data).
@@ -55,11 +55,15 @@ class Fetcher:
        ## TODO Cache data
        return json
 
-
+from config import Config
+from constants import *
 class FetcherTest(unittest.TestCase):
     """ Simple test to learn unit testing """
-    def test_credentials(self):
-       pass 
+    def test_retrieve_data(self):
+        Config.parse_file(DEFAULT_CONF_FILE)
+        name,anal = Config.analysis.popitem()
+        name,source = Config.source.popitem()
+        json = retrieve_data(source,anal)
 
 
 if __name__ == '__main__':
