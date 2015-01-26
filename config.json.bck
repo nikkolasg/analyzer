@@ -1,0 +1,29 @@
+{
+    "databases" : [
+    { "host":"127.0.0.1",
+        "dbtype":"mysql",
+        "database":"EMM",
+        "user":"emm_op",
+        "password":"em7"} ],
+    "tables" : [
+    { "name": "MSS",
+        "table_name": "MON_MSS_STATS",
+        "time_field": "timest",
+        "fields":["type"],
+        "database":"EMM"}
+    ],
+        "sources": [
+        { "name": "mss_onnet",
+            "table": "MSS",
+            "where_clause": "source = 5 AND type = 8" } ],
+        "analysis" : [
+        { "name": "moving_average",
+            "sources": "mss_onnet",
+            "window":"1",
+            "slice":"5",
+            "period":604800,
+            "nb_periods":3, 
+            "algorithm":"Generic"
+        } ]
+}
+
