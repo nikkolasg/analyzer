@@ -41,7 +41,8 @@ class Fetcher:
         min_sec = analyse.nb_periods * analyse.periods
         lower_ts = (args.timeref - datetime.timedelta(seconds=min_sec)).timestamp()
         sql += " AND " + table.time_field + " < " + upper_ts +
-               " AND " + table.time_field + " > " + lower_ts
+               " AND " + table.time_field + " > " + lower_ts + 
+               " ORDER BY " + table.time_field + " DESC"
 
         db = source.database
         with db.connect() as cursor:
