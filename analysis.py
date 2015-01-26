@@ -1,6 +1,8 @@
 import sys
 import logging as log
 import util
+from report import Report
+
 class Analysis:
     global arg
     """ This class is used to describe an analysis we want to make.
@@ -19,6 +21,7 @@ class Analysis:
         self.window = window
         ## options for the algorithm
         self.options = opts
+        self.report = Report()
 
     
     @classmethod

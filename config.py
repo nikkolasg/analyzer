@@ -125,7 +125,7 @@ class Config(object):
                 log.warning("Algorithm {} not recognized. Please lookup in algorithm/__init__.py to see if you import it well".format(a.algorithm))
                 continue
             ## instantiate the class
-            a.algorithm = globals()[a.algorithm](a.options)
+            a.algorithm = globals()[a.algorithm](a,a.options)
             self.analysis[a.name] = a
         return noerr
 

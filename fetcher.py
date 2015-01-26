@@ -4,12 +4,14 @@ import datetime
 import logging as log
 import database
 from parser import args
-class Fetcher:
+import util
+class Fetcher(metaclass=util.Singleton:
     """This class is responsible for fetching the data out 
     of sources according to certain criterions (data).
     The data going out of fetcher is in JSON format, such as
     time: TIMESTAMP,
     values: [v1]"""
+
     def __init__(self):
        self.cache = dict()
     
