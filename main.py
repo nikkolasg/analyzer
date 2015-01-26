@@ -10,7 +10,8 @@ from parser import args
 def setup_logging():
     """Setup the different logging handlers etc"""
     levels = { 3: log.DEBUG,
-               2: log.INFO}
+               2: log.INFO,
+               1: log.INFO}
     lvl = args.verbosity
     if lvl not in levels: lvl = c.DEFAULT_VERBOSE_LEVEL
     log.basicConfig(format="%(levelname)s\t%(asctime)s\t %(message)s",datefmt="%Y-%m-%d %H:%M",level=levels[lvl])

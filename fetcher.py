@@ -34,27 +34,33 @@ class Fetcher:
         For this iteration, we do it very simply. Compute one query per source,
         and one source contains one type of data, i.e. will retrieve only one 'counter'"""
         json = []
+        sql = self.compute_sql(source,analyse)
+        db = source.table.database
+        return self.execute_sql(db,sql)
+       
+    def compute_sql(self,source,analyse):
+        """Create the sql statement that is to be used in the analysis"""
         table = source.table
-        sql = "SELECT " + table.time_field + ", " + table.counter 
-        sql +=" FROM " + table.table_name  
-        sql +=" WHERE " + source.where_clause 
+        sql =  "SELECT " + table.time_field + ", " + table.counter 
+        sql += " FROM " + table.table_name  
+        sql += " WHERE " + source.where_clause 
         upper_ts = int(args.timeref.timestamp())
         min_sec = analyse.nb_periods * analyse.period
         lower_ts = int((args.timeref - datetime.timedelta(seconds=min_sec)).timestamp())
         sql += " AND " + table.time_field + " BETWEEN "
         sql +=  str(lower_ts) + " AND " + str(upper_ts)
         sql += " ORDER BY " + table.time_field + " DESC"
-        
-        db = table.database
+        return sql
+
+    def execute_sql(self,db,sql):
+        json = []
         with db.connect() as cursor:
-            log.debug("Fetcher query analyse {} -> source {} :\n{}".format(analyse.name,source.name,sql))
+            log.debug("Fetcher query : \n{}".format(sql))
             cursor.execute(sql)
             for timest,counter in cursor:
                 json.append((timest, counter))
-       
-        ## TODO Cache data
         return json
-
+       
 from config import Config
 from constants import *
 import util
