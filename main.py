@@ -9,11 +9,8 @@ from parser import args
 
 def setup_logging():
     """Setup the different logging handlers etc"""
-    levels = { 0: log.DEBUG,
-               1: log.INFO,
-               2: log.WARNING,
-               3: log.ERROR,
-               4: log.CRITICAL}
+    levels = { 3: log.DEBUG,
+               2: log.INFO}
     lvl = args.verbosity
     if lvl not in levels: lvl = c.DEFAULT_VERBOSE_LEVEL
     log.basicConfig(format="%(levelname)s\t%(asctime)s\t %(message)s",datefmt="%Y-%m-%d %H:%M",level=levels[lvl])
@@ -21,15 +18,19 @@ def setup_logging():
 def credentials():
     return "Analysis tool v1.0 written in Python by nikkolasg & Jan De Liener."
 
-def main():
+def setup():
     setup_logging()
     log.info(credentials())
-    Config.parse_file(args.config)
+def cleanup():
     log.info("Application exiting ...")
+def main():
+    Config.parse_file(args.config)
 
 
 if __name__ == '__main__':
+    setup()
     main()
+    cleanup()
      
 
 

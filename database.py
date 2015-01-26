@@ -73,11 +73,12 @@ class MysqlDatabase(Database):
     def connect(self):
         try:
             self.cnx = mysql.connector.connect(user=self.user,
-                database=self.db,
+                database=self.database,
                 host=self.host,
-                password=self.pwd)
+                password=self.password)
             log.debug("Connection to database opened")
-            yield self.cnx
+            self.cursor = self.cnx.cursor()
+            yield self.cursor
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
                 log.error("Something is wrong with your user name or password")
@@ -86,8 +87,11 @@ class MysqlDatabase(Database):
                 raise err
         except Exception as e:
             log.error(str(e))
+            if self.cursor: self.cursor.close()
+            if self.cnx: self.cnx.close()
             raise e
         else:
+            self.cursor.close()
             self.cnx.close()
             log.debug("Closed connection ..")
         return

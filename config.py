@@ -31,6 +31,7 @@ class Config(object):
                 json_ = json.load(file)
         except IOError as e:
             log.error("Error while reading config file : {0}".format(e))
+            raise e
         else:
             return Config.parse_json(json_)
 
@@ -62,7 +63,10 @@ class Config(object):
         if "analysis" in json:
             noerr = noerr and self.handle_analysis(json["analysis"])
             log.debug("Analysis dict : {}".format(self.analysis))
-        log.info("Config file parsed ... Ok :)")
+        if noerr == True:
+            log.info("Config file parsed ... Ok :)")
+        else:
+            log.warning("Config file parsed ... Error  // ! \\\\")
         return noerr
 
     @classmethod
@@ -138,6 +142,7 @@ class Config(object):
                 noerr = False
                 log.warning("Table {} not recognized in the source {} in configuration.".format(s.table,s.name))
                 continue
+            s.table = self.tables[s.table]
             self.sources[s.name] = s
         return noerr
 
@@ -155,7 +160,7 @@ class ConfigTest(unittest.TestCase):
         self.assertIsNone(Config.parse_json(json))
 
     def test_parse_good_json(self):
-        json = {
+        data = {
                 "databases" : [
                     { "host":"127.0.0.1",
                         "dbtype":"mysql",
@@ -178,11 +183,23 @@ class ConfigTest(unittest.TestCase):
                                 "sources": "mss_onnet",
                                 "window":"10",
                                 "slice":"5",
+                                "period":1,
+                                "nb_periods":3,
                                 "algorithm":"Generic"
                                 } ]
                             }
-        self.assertTrue(Config.parse_json(json))
+        self.assertTrue(Config.parse_json(data))
+        for n,s in Config.databases.items():
+            self.assertIsInstance(s,Database)
+        for n,s in Config.tables.items():
+            self.assertIsInstance(s,Table)
 
+        for n,s in Config.sources.items():
+            self.assertIsInstance(s,Source)
+            self.assertIsInstance(s.table,Table)
+
+        for n,s in Config.analysis.items():
+            self.assertIsInstance(s,Analysis)
 
 
 if __name__ == '__main__':

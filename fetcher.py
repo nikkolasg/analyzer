@@ -3,6 +3,7 @@ import unittest
 import datetime
 import logging as log
 import database
+from parser import args
 class Fetcher:
     """This class is responsible for fetching the data out 
     of sources according to certain criterions (data).
@@ -26,7 +27,7 @@ class Fetcher:
         return "Fetcher : "
 
 
-    def retrieve_data(source,analyse):
+    def retrieve_data(self,source,analyse):
         """Actually make and query the SQL statement"""
         """For now, the model is timestamp, field1,field2..., counter.
         There is a certain value in counter for certains values in fields.
@@ -34,37 +35,43 @@ class Fetcher:
         and one source contains one type of data, i.e. will retrieve only one 'counter'"""
         json = []
         table = source.table
-        sql = "SELECT " + table.time_field ", " + table.counter +
-            "FROM " + table.table_name + 
-            "WHERE " + source.where_clause 
-        upper_ts = args.timeref.timestamp()
-        min_sec = analyse.nb_periods * analyse.periods
-        lower_ts = (args.timeref - datetime.timedelta(seconds=min_sec)).timestamp()
-        sql += " AND " + table.time_field + " < " + upper_ts +
-               " AND " + table.time_field + " > " + lower_ts + 
-               " ORDER BY " + table.time_field + " DESC"
-
-        db = source.database
+        sql = "SELECT " + table.time_field + ", " + table.counter 
+        sql +=" FROM " + table.table_name  
+        sql +=" WHERE " + source.where_clause 
+        upper_ts = int(args.timeref.timestamp())
+        min_sec = analyse.nb_periods * analyse.period
+        lower_ts = int((args.timeref - datetime.timedelta(seconds=min_sec)).timestamp())
+        sql += " AND " + table.time_field + " BETWEEN "
+        sql +=  str(lower_ts) + " AND " + str(upper_ts)
+        sql += " ORDER BY " + table.time_field + " DESC"
+        
+        db = table.database
         with db.connect() as cursor:
-            log.debug("Fetcher query analyse {} -> source {} :\n{}".format(analyse.name,source.name,sql)
-            res = cursor.query(sql)
-
-        for timest,counter in res:
-            json.append((timest, counter))
+            log.debug("Fetcher query analyse {} -> source {} :\n{}".format(analyse.name,source.name,sql))
+            cursor.execute(sql)
+            for timest,counter in cursor:
+                json.append((timest, counter))
        
-       ## TODO Cache data
-       return json
+        ## TODO Cache data
+        return json
 
 from config import Config
 from constants import *
+import util
+import main
 class FetcherTest(unittest.TestCase):
     """ Simple test to learn unit testing """
     def test_retrieve_data(self):
+        main.setup()
         Config.parse_file(DEFAULT_CONF_FILE)
         name,anal = Config.analysis.popitem()
-        name,source = Config.source.popitem()
-        json = retrieve_data(source,anal)
-
+        name,source = Config.sources.popitem()
+        fetcher = Fetcher()
+        json = fetcher.retrieve_data(source,anal)
+        util.pprint_data(json)
+        self.assertTrue(len(json) > 1)
+        self.assertIsInstance(json.pop(),tuple)
+        
 
 if __name__ == '__main__':
    unittest.main() 
