@@ -5,7 +5,7 @@ import logging as log
 from config import Config
 import constants as c
 from parser import args
-
+import controls
 
 def setup_logging():
     """Setup the different logging handlers etc"""
@@ -26,6 +26,7 @@ def cleanup():
     log.info("Application exiting ...")
 def main():
     Config.parse_file(args.config)
+    controls.run_all()
 
 
 if __name__ == '__main__':

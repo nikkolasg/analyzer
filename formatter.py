@@ -5,7 +5,7 @@ import logging as log
 import pdb
 def format(json, analysis):
     newjson = {}
-    for source_name,data in json:
+    for source_name,data in json.items():
         newjson[source_name] = format_data(data,
                                             analysis.slice,
                                             analysis.period,

@@ -23,11 +23,11 @@ class SimpleAverage(Generic):
 
     def __init__(self,analysis,options = dict):
         Generic.__init__(self,analysis,options)
-        self.threshold = int(options["threshold"]) if "threshold" in options else 0.5
+        self.threshold = float(options["threshold"]) if "threshold" in options else 0.5
 
     def run(self,json):
         """ Main method to call, will run the algorithm for each sources"""
-        for source,data in json:
+        for source,data in json.items():
             self.analyse(source,data)
 
     def analyse(self,source,data):
@@ -45,20 +45,21 @@ class SimpleAverage(Generic):
         while ( i < len(data) ):
             avg += data[i][1]
             count += 1
-            i += window - 1
+            i += window 
         
-        avg /= count
+        avg /= count if count != 0 else 1
         low,up = self.bounds(avg)
+        self.analysis.report.store(Report.INFO,"Simple Average : new value = {}, average = {} & {} threshold ==> [{},{}]".format(new_point,avg,self.threshold,low,up))
         if new_point < low:
-            analysis.report.store(Report.ERROR,"Anomaly Detected in source {}: new point {} on {} is below threshold!".format(source,*data[0]))
+            self.analysis.report.store(Report.ERROR,"Anomaly Detected in source {}: new point {} on {} is below threshold!".format(source,data[0][1],util.ts2date(data[0][0])))
         elif new_point > up:
-            analysis.report.store(Report.ERROR,"Anomaly Detected in source {}: new point {} on {} is above trheshold!".format(source,*data[0]))
+            self.analysis.report.store(Report.ERROR,"Anomaly Detected in source {}: new point {} on {} is above trheshold!".format(source,data[0][1],util.ts2date(data[0][0])))
         else:
-            analysis.report.store(Report.INFO,"No anomaly detected in source {}. All fine =)".format(source))
+            self.analysis.report.store(Report.INFO,"No anomaly detected in source {}. All fine =)".format(source))
 
     def bounds(self,average):
         """Return simple calculated interval for a average value """
-        return (average + average * self.threshold,average - average * self.threshold)
+        return (int(average - average * self.threshold),int(average + average * self.threshold))
         
 
 

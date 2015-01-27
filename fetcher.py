@@ -5,7 +5,7 @@ import logging as log
 import database
 from parser import args
 import util
-class Fetcher(metaclass=util.Singleton:
+class Fetcher(metaclass=util.Singleton):
     """This class is responsible for fetching the data out 
     of sources according to certain criterions (data).
     The data going out of fetcher is in JSON format, such as
@@ -15,21 +15,21 @@ class Fetcher(metaclass=util.Singleton:
     def __init__(self):
        self.cache = dict()
     
-    def get_data(analyse):
+    def get_data(self,analyse):
         """ Main method. Pass it an analyze object, to retrieve data from.
         You can specify options here like window and width"""
         ## TODO : merge at the most possible the differents source fields required,
         ## to query as little as we can on the db
         json = {}
         for source in analyse.sources:
-            json[source.name] = retrieve_data(analyse,source)
+            json[source.name] = self.retrieve_data(analyse,source)
         return json
 
     def __str__(self):
         return "Fetcher : "
 
 
-    def retrieve_data(self,source,analyse):
+    def retrieve_data(self,analyse,source):
         """Actually make and query the SQL statement"""
         """For now, the model is timestamp, field1,field2..., counter.
         There is a certain value in counter for certains values in fields.

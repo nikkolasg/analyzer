@@ -22,6 +22,13 @@ class Analysis:
         ## options for the algorithm
         self.options = opts
         self.report = Report()
+        self.report.store(Report.DEBUG,"Analysis {} with :".format(name))
+        self.report.store(Report.DEBUG,"\t-{} sources".format(len(sources)))
+        self.report.store(Report.DEBUG,"\t-{} algorithm".format(algorithm))
+        self.report.store(Report.DEBUG,"\t-{} periods of {} secs".format(nb_periods,period))
+        self.report.store(Report.DEBUG,"\t-slice of {} secs".format(slice))
+        self.report.store(Report.DEBUG,"\t-window size of {}".format(window)) 
+
 
     
     @classmethod
