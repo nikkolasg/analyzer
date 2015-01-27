@@ -13,7 +13,7 @@ class Report:
     def store(self,level, message):
         if level not in self.messages: level = Report.INFO
         self.messages[level].append(message)
-
+    
     def summary(self,tolog=True,tofile=None):
         """Return a summary of the reports. Basically all reports organized by level of 
         gravity. You can pass it a log = False to NOT print on the log output, and file

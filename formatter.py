@@ -54,8 +54,8 @@ def format_data(data,slice,period,nb_periods,window):
             ## that may fall down under the SAME slice, will be evaluated
             next_bound = get_upper_bound(next_ts,slice)
             ## iterate as long as we dont find a good point,i.e. first time of slice
-            while(data[i][0] > next_bound and i < len(data)): i += 1
-            if i == len(data): break
+            while( i < len(data) and data[i][0] > next_bound): i += 1
+            if i >= len(data): break
             
             #found the first time of slice iterate until start of next period
             while(data[i][0] > next_ts and i < len(data)): 
