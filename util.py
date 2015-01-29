@@ -10,10 +10,14 @@ def pprint_data(json):
     will output date,value
     """
     for ts,value in json:
-        print(ts2date(ts) + " -> " + str(value))
+        print(ts2str(ts) + " -> " + str(value))
     
-def ts2date(ts):
+def ts2str(ts):
     return str(d.datetime.fromtimestamp(ts))
+def ts2date(ts):
+    return d.datetime.fromtimestamp(ts)
+def now2str():
+    return d.datetime.now().strftime("%Y%m%d%H%M%S")
 
 class Singleton(type):
     instance = None

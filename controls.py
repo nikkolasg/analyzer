@@ -14,8 +14,8 @@ def run_analysis(analysis):
     data = get_data_analysis(analysis)
     pdata = format_data(data,analysis)
     run_algorithm(analysis.algorithm,pdata)
-    analysis.report.summary() 
-
+    analysis.reports() 
+    
 def get_data_analysis(analysis):
     """Retrieve the data for a source"""
     fetcher = Fetcher()

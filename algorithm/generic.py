@@ -35,6 +35,11 @@ class SimpleAverage(Generic):
         if len(data) < 2:
             log.warning("Not enough data to analyse from {} for SimpleAverage algorithm".format(source))
             return
+        report = self.analysis.report
+        graph = []
+        min_ts = data[0][0]
+        max_ts = data[len(data)-1][0]
+
         new_point = data[0][1]
         avg = 0
         count = 0 
@@ -44,18 +49,24 @@ class SimpleAverage(Generic):
         window = self.analysis.window
         while ( i < len(data) ):
             avg += data[i][1]
+            graph.append([data[i][0],data[i][1]])
             count += 1
             i += window 
         
         avg /= count if count != 0 else 1
         low,up = self.bounds(avg)
-        self.analysis.report.store(Report.INFO,"Simple Average : new value = {}, average = {} (for {} values) & {} threshold ==> [{},{}]".format(new_point,int(avg),count,self.threshold,low,up))
+        report.store_message(Report.INFO,"Simple Average : new value = {}, average = {} (for {} values) & {} threshold ==> [{},{}]".format(new_point,int(avg),count,self.threshold,low,up))
         if new_point < low:
-            self.analysis.report.store(Report.ERROR,"Anomaly Detected in source {}: new point {} on {} is below threshold!".format(source,data[0][1],util.ts2date(data[0][0])))
+            report.store_message(Report.ERROR,"Anomaly Detected in source {}: new point {} on {} is below threshold!".format(source,data[0][1],util.ts2str(data[0][0])))
         elif new_point > up:
-            self.analysis.report.store(Report.ERROR,"Anomaly Detected in source {}: new point {} on {} is above trheshold!".format(source,data[0][1],util.ts2date(data[0][0])))
+            report.store_message(Report.ERROR,"Anomaly Detected in source {}: new point {} on {} is above trheshold!".format(source,data[0][1],util.ts2str(data[0][0])))
         else:
-            self.analysis.report.store(Report.INFO,"No anomaly detected in source {}. All fine =)".format(source))
+            report.store_message(Report.INFO,"No anomaly detected in source {}. All fine =)".format(source))
+
+        report.add_curve("Simple Average","data",graph)
+        report.add_curve("Simple Average","average",[[min_ts,avg],[max_ts,avg]])
+        report.add_curve("Simple Average","upper bound",[[min_ts,up],[max_ts,up]])
+        report.add_curve("Simple Average","lower bound",[[min_ts,low],[max_ts,low]])
 
     def bounds(self,average):
         """Return simple calculated interval for a average value """
