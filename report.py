@@ -15,17 +15,15 @@ class Report:
     with multiple lines insede."""
     DEBUG = 0
     INFO = 1
-    ERROR = 2
-    CRITICAL = 3
+    ANOMALY = 2
     DIR_GRAPH = "graphs"
     def __init__(self):
-        self.messages = { key: [] for key in (Report.DEBUG,Report.INFO,Report.ERROR,Report.CRITICAL) }
+        self.messages = []
         self.graphs = {}
         self.time_format = md.DateFormatter("%Y-%m-%d %H:%M:%S")
 
     def store_message(self,level, message):
-        if level not in self.messages: level = Report.INFO
-        self.messages[level].append(message)
+        self.messages.append((level,message))
     
     def summary(self,tolog=True,tofile=None):
         """Return a summary of the reports. Basically all reports organized by level of 
@@ -40,14 +38,15 @@ class Report:
         log.info("-" * 50)
 
     def summary_log(self):
-        for mess in self.messages[Report.DEBUG]:
-            log.debug(mess)
-        for mess in self.messages[Report.INFO]:
-            log.info(mess)
-        for mess in self.messages[Report.ERROR]:
-            log.warning(mess)
-        for mess in self.messages[Report.CRITICAL]:
-            log.critical(mess)
+        for level,message in self.messages:
+            if level == Report.DEBUG:
+                log.debug(message)
+            elif level == Report.INFO:
+                log.info(message)
+            elif level == Report.ANOMALY: 
+                log.error(message)
+                # send_report !
+
 
     def summary_file(self,file):
         pass
@@ -76,9 +75,8 @@ class Report:
             row += 1
         fig.savefig(fname,format="png",transparent="False",
                     bbox_extra_artists=legends,bbox_inches="tight")
-        log.info("Graph has been exported to {} .".format(fname))
+        self.store_message(Report.INFO,"Graph has been exported to {} .".format(fname))
             
-
     def generate_plot(self,subplot,name,graph):
         """ Generate a plot on the subplot object, in the row-th row,
         will be named "name" and contains the data in graph.

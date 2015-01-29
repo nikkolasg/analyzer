@@ -31,10 +31,10 @@ class Analysis:
 
     def reports(self):
         """Will print the reports and graph according to args"""
-        self.report.summary()
         if args.graphs: 
             fname = util.now2str() + "_" + self.name + ".png"
             self.report.save_graph(fname)
+        self.report.summary()
     
     @classmethod
     def parse_json(self,json):

@@ -55,7 +55,7 @@ class SimpleAverage(Generic):
         
         avg /= count if count != 0 else 1
         low,up = self.bounds(avg)
-        report.store_message(Report.INFO,"Simple Average : new value = {}, average = {} (for {} values) & {} threshold ==> [{},{}]".format(new_point,int(avg),count,self.threshold,low,up))
+        report.store_message(Report.DEBUG,"Simple Average : new value = {}, average = {} (for {} values) & {} threshold ==> [{},{}]".format(new_point,int(avg),count,self.threshold,low,up))
         if new_point < low:
             report.store_message(Report.ERROR,"Anomaly Detected in source {}: new point {} on {} is below threshold!".format(source,data[0][1],util.ts2str(data[0][0])))
         elif new_point > up:

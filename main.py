@@ -9,8 +9,7 @@ import controls
 
 def setup_logging():
     """Setup the different logging handlers etc"""
-    levels = { 3: log.DEBUG,
-               2: log.INFO,
+    levels = { 2: log.DEBUG,
                1: log.INFO}
     lvl = args.verbosity
     if lvl not in levels: lvl = c.DEFAULT_VERBOSE_LEVEL
