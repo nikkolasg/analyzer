@@ -1,0 +1,3 @@
+apt-get install ipython3
+apt-get install ipython3-notebook
+apt-get install python3-matplotlib
