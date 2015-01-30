@@ -1,4 +1,5 @@
 from report import Report
+import logging as log
 class Generic:
     """ Represent base class of any algorithm to implement"""
     def __init__(self,analysis,options = dict):
@@ -32,10 +33,10 @@ class SimpleAverage(Generic):
 
     def analyse(self,source,data):
         """ The algorithm it self for one source / data pair"""
-        if len(data) < 2:
-            log.warning("Not enough data to analyse from {} for SimpleAverage algorithm".format(source))
-            return
         report = self.analysis.report
+        if len(data) < 2:
+            report.store_message(Report.INFO,"Not enough data to analyse from {} for SimpleAverage algorithm".format(source))
+            return
         graph = []
         min_ts = data[0][0]
         max_ts = data[len(data)-1][0]
@@ -57,9 +58,9 @@ class SimpleAverage(Generic):
         low,up = self.bounds(avg)
         report.store_message(Report.DEBUG,"Simple Average : new value = {}, average = {} (for {} values) & {} threshold ==> [{},{}]".format(new_point,int(avg),count,self.threshold,low,up))
         if new_point < low:
-            report.store_message(Report.ERROR,"Anomaly Detected in source {}: new point {} on {} is below threshold!".format(source,data[0][1],util.ts2str(data[0][0])))
+            report.store_message(Report.ANOMALY,"Anomaly Detected in source {}: new point value {} on {} is below threshold!".format(source,data[0][1],util.ts2str(data[0][0])))
         elif new_point > up:
-            report.store_message(Report.ERROR,"Anomaly Detected in source {}: new point {} on {} is above trheshold!".format(source,data[0][1],util.ts2str(data[0][0])))
+            report.store_message(Report.ANOMALY,"Anomaly Detected in source {}: new point value {} on {} is above trheshold!".format(source,data[0][1],util.ts2str(data[0][0])))
         else:
             report.store_message(Report.INFO,"No anomaly detected in source {}. All fine =)".format(source))
 

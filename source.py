@@ -21,6 +21,6 @@ class Source:
             return None
         table = json["table"]
         
-        where_clause = json["where_clause"] if "where_clause" in json else ""
+        where_clause = json["where_clause"] if "where_clause" in json else None
         return Source(name,table,where_clause)
 

@@ -45,11 +45,13 @@ class Fetcher(metaclass=util.Singleton):
         table = source.table
         sql =  "SELECT " + table.time_field + ", " + table.counter 
         sql += " FROM " + table.table_name  
-        sql += " WHERE " + source.where_clause 
+        sql += " WHERE "
+        if source.where_clause:
+            sql += source.where_clause + " AND "
         upper_ts = int(args.timeref.timestamp())
         min_sec = analyse.nb_periods * analyse.period
         lower_ts = int((args.timeref - datetime.timedelta(seconds=min_sec)).timestamp())
-        sql += " AND " + table.time_field + " BETWEEN "
+        sql +=  table.time_field + " BETWEEN "
         sql +=  str(lower_ts) + " AND " + str(upper_ts)
         sql += " ORDER BY " + table.time_field + " DESC"
         return sql

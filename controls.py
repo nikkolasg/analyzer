@@ -4,10 +4,17 @@ from fetcher import Fetcher
 import logging as log
 import formatter as f
 from config import Config
+from parser import args
 
 def run_all():
-    for name,analysis in Config.analysis.items():
-        run_analysis(analysis)
+    if args.analysis :
+        if args.analysis not in Config.analysis:
+            log.error("Analysis specified in command line not known ... Abort.")
+            exit(1)
+        run_analysis(Config.analysis[args.analysis])
+    else:
+        for name,analysis in Config.analysis.items():
+            run_analysis(analysis)
     
 def run_analysis(analysis):
     """Run a complete analysis from beginning to the end"""
