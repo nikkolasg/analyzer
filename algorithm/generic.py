@@ -20,7 +20,9 @@ import util
 
 class SimpleAverage(Generic):
     """ Simple average algorithm where it takes the average of the precedent values
-    and compare it to the most recent one"""
+    and compare it to the most recent one. It removes the values from
+    the highest and lowest point. and may have different threshold for the upper 
+    and lower bound"""
 
     def __init__(self,analysis,options = dict):
         Generic.__init__(self,analysis,options)
