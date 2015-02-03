@@ -80,6 +80,10 @@ class Analysis:
         else:
             window = 1
         options = json.copy()
+        
+        if slice > period:
+            log.error("Analysis {} has a slice {} greater than its period {}. Invalid parameters.")
+            main.cleanup(code = 1)
 
         return Analysis(name,sources,algorithm,period,nb_periods,slice,window,options)
         

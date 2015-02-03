@@ -9,6 +9,7 @@ import matplotlib.font_manager as fm
 import numpy as np
 import util
 import subprocess
+from parser import args
 class Report:
     """Class that is used to store multiple reports, by level of gravity
     and can display them after the analysis is done.
@@ -24,6 +25,7 @@ class Report:
         self.messages = []
         self.graphs = {}
         self.time_format = md.DateFormatter("%Y-%m-%d %H:%M:%S")
+        self.fname = None
 
     def store_message(self,level, message):
         self.messages.append((level,message))
@@ -65,7 +67,8 @@ class Report:
         level = "'ERROR'"
         try:
             log.debug("Will call the 'alert.pl' utility with : %s" % " ".join([exec_path,level,"\"" + msg + "\""]))
-            subprocess.check_call([exec_path,level,msg])
+            if args.verbosity < 2:
+                subprocess.check_call([exec_path,level,msg])
         except subprocess.CalledProcessError:
             log.error("Error when calling the \"alert.pl\" utility /!\\")
         else: 

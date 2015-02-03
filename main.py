@@ -21,8 +21,9 @@ def credentials():
 def setup():
     setup_logging()
     log.info(credentials())
-def cleanup():
+def cleanup(code = 0):
     log.info("Application exiting ...")
+    exit(code)
 def main():
     Config.parse_file(args.config)
     controls.run_all()

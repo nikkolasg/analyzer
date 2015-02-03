@@ -5,6 +5,13 @@
 # prepaid.service@orange.ch
 # v 0.1.0 - 2012-11-15 jd : a frist shot
 use File::Spec;
+use Getopt::Long;
+my $debug = "";
+GetOptions("debug" => \$debug);
+if($debug) {
+    exit(0);
+}
+
 $loglevel = shift(@ARGV);
 $logmsg   = join(" ",@ARGV);
 
