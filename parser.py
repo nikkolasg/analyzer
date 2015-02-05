@@ -1,6 +1,6 @@
 import argparse
 import constants as c
-import dateutil.parser as parser
+import dateutil.parser as dparser
 import datetime
 import util
 def date(string):
@@ -10,7 +10,7 @@ def date(string):
                                 ## a good ts.................. boring
     except ValueError:
         ## this is a string date
-        return parser.parse(string)
+        return dparser.parse(string)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-v","--verbosity",help="verbosity level. Specify -v for DEBUG logging",action="count",default=c.DEFAULT_VERBOSE_LEVEL)
@@ -18,6 +18,7 @@ parser.add_argument("-c","--config",help="specify a config file.Default is confi
 parser.add_argument("-t","--timeref",help="Time Reference is the most recent time you want to analyze data. By default is the current time",type=date,default=datetime.datetime.now())
 parser.add_argument("-g","--graphs",help="Generate graphs from reports into the graph folder",action="store_true")
 parser.add_argument("--analysis",help="If you only want to run a specfic analysis")
+parser.add_argument("--noalert",help="Disable alert utility. useful for testing new data set.",action="store_true",default=False)
 
 args = parser.parse_args()
 import unittest

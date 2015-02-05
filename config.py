@@ -53,16 +53,16 @@ class Config(object):
         noerr = True 
         if "databases" in json:
             noerr = noerr and self.handle_databases(json["databases"])
-            log.debug("Databases dict : {}".format(self.databases))
+            #log.debug("Databases dict : {}".format(self.databases))
         if "tables" in json:
             noerr = noerr and self.handle_tables(json["tables"])
-            log.debug("Tables dict : {}".format(self.tables))
+            #log.debug("Tables dict : {}".format(self.tables))
         if "sources" in json:
             noerr = noerr and self.handle_sources(json["sources"])
-            log.debug("Sources dict : {}".format(self.sources))
+            #log.debug("Sources dict : {}".format(self.sources))
         if "analysis" in json:
             noerr = noerr and self.handle_analysis(json["analysis"])
-            log.debug("Analysis dict : {}".format(self.analysis))
+            #log.debug("Analysis dict : {}".format(self.analysis))
         if noerr == True:
             log.info("Config file parsed ... Ok :)")
         else:

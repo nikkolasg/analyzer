@@ -67,7 +67,7 @@ class Report:
         level = "'ERROR'"
         try:
             log.debug("Will call the 'alert.pl' utility with : %s" % " ".join([exec_path,level,"\"" + msg + "\""]))
-            if args.verbosity < 2:
+            if not args.noalert:
                 subprocess.check_call([exec_path,level,msg])
         except subprocess.CalledProcessError:
             log.error("Error when calling the \"alert.pl\" utility /!\\")

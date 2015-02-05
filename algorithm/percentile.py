@@ -18,7 +18,8 @@ class Percentile(Generic):
             return tu[1]
         report = self.analysis.report
         if len(data) < 2:
-            report.store_message(Report.INFO,"Not enough data to analyse from {} for Percentile algorithm".format(source.name))
+            report.store_message(Report.INFO,"Not enough data to analyse from {} for Percentile algorithm".format(source))
+            return
 
         new_ts,new_point = data[0][0],data[0][1]
         
