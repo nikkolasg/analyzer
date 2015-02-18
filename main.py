@@ -16,7 +16,7 @@ def setup_logging():
     log.basicConfig(format="%(levelname)s\t%(asctime)s\t%(message)s",datefmt="%Y-%m-%d %H:%M",level=levels[lvl])
 
 def credentials():
-    return "Analysis tool v1.0 written in Python by nikkolasg & Jan De Liener."
+    return "Analysis tool v1.0 written in Python by nikkolasg."
 
 def setup():
     setup_logging()

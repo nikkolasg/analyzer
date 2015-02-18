@@ -4,6 +4,7 @@ import datetime
 import logging as log
 import database
 from parser import args
+import collections
 import util
 class Fetcher(metaclass=util.Singleton):
     """This class is responsible for fetching the data out 
@@ -20,7 +21,7 @@ class Fetcher(metaclass=util.Singleton):
         You can specify options here like window and width"""
         ## TODO : merge at the most possible the differents source fields required,
         ## to query as little as we can on the db
-        json = {}
+        json = collections.OrderedDict()
         for source in analyse.sources:
             json[source.name] = self.retrieve_data(analyse,source)
         return json
@@ -38,7 +39,10 @@ class Fetcher(metaclass=util.Singleton):
         json = []
         sql = self.compute_sql(source,analyse)
         db = source.table.database
-        return self.execute_sql(db,sql)
+        json = self.execute_sql(db,sql)
+        ## skip the first result !
+        if source.skip_first_interval: json = json[1:]
+        return json
        
     def compute_sql(self,source,analyse):
         """Create the sql statement that is to be used in the analysis"""
@@ -49,7 +53,9 @@ class Fetcher(metaclass=util.Singleton):
         if source.where_clause:
             sql += source.where_clause + " AND "
         upper_ts = int(args.timeref.timestamp())
-        min_sec = analyse.nb_periods * analyse.period
+        ## if we want to skip first interval, just take one more at the end and filter the first result
+        ## Way more easy and readable than trying to get the hour of the reference timestamp etc etc
+        min_sec = ((analyse.nb_periods+1) if source.skip_first_interval else analyse.nb_periods) * analyse.period
         lower_ts = int((args.timeref - datetime.timedelta(seconds=min_sec)).timestamp())
         sql +=  table.time_field + " BETWEEN "
         sql +=  str(lower_ts) + " AND " + str(upper_ts)

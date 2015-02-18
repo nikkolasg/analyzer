@@ -19,6 +19,7 @@ parser.add_argument("-t","--timeref",help="Time Reference is the most recent tim
 parser.add_argument("-g","--graphs",help="Generate graphs from reports into the graph folder",action="store_true")
 parser.add_argument("--analysis",help="If you only want to run a specfic analysis")
 parser.add_argument("--noalert",help="Disable alert utility. useful for testing new data set.",action="store_true",default=False)
+parser.add_argument("-d","--debug",help="Launch the PDB debugger interactive mode",action="store_true")
 
 args = parser.parse_args()
 import unittest

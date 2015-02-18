@@ -4,17 +4,19 @@
 import logging as log
 import pdb
 import util
+import pdb
 def format(json, analysis):
     newjson = {}
     #util.pretty(json,text = "JSON BEFORE FORMAT ")
     for source_name,data in json.items():
+        #pdb.set_trace()
         newjson[source_name] = format_data(data,
-                                            analysis.slice,
-                                            analysis.period,
-                                            analysis.nb_periods,
-                                            analysis.window) 
+                analysis.slice,
+                analysis.period,
+                analysis.nb_periods,
+                analysis.window) 
 
-    util.pretty(newjson,"JSON AFTER FORMAT ")
+        util.pretty(newjson[source_name],"JSON AFTER FORMAT {} ".format(source_name))
     return newjson
 
 def format_data(data,slice,period,nb_periods,window):
@@ -83,9 +85,9 @@ def format_data(data,slice,period,nb_periods,window):
             newjson.append((tslice,vslice))
             break
     return newjson
-          
-            
-           
+
+
+
 
 
 def get_next_period_slice_bounds(next_ts,slice):
@@ -102,7 +104,6 @@ def get_lower_bound(ts,slice):
 
 def get_upper_bound(ts,slice):
     return ts if ts % slice == 0 else ts + (slice - (ts % slice))
-
 import unittest
 from constants import *
 from config import Config
@@ -171,6 +172,11 @@ class FormatterTest(unittest.TestCase):
         util.pretty(data,text = "SLICE WINDOW Before format",output = "tty" )
         util.pretty(pdata,text = "SLICE WINDOW After format",output = "tty")
         self.assertEqual(window * nb_periods,len(pdata))
+
+
+       
+
+
     @classmethod
     def construct_data(self,unit=60,period=3600,nb_period=3):
         """ Construct a sample json with a simple y=2x linear curve

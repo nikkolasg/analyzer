@@ -9,12 +9,12 @@ class Analysis:
     It is generally composed of a name (or id ),a source name (for now, later we may 
     implement a multi source analysis), some fields to analyze,
     with some conditions (for now Sql where clause statements)
-    and an algorithm name, followed by options for this algorithm"""
+    and one or multiple  algorithm name, followed by options for theses algorithms"""
 
-    def __init__(self,name,sources,algorithm,period,nb_periods,slice,window=1,opts = {}):
+    def __init__(self,name,sources,algorithms,period,nb_periods,slice,window=1,opts = {}):
         self.name = name
         self.sources = sources
-        self.algorithm = algorithm
+        self.algorithms = util.listize(algorithms)
         self.slice = slice
         self.period = period 
         self.nb_periods = nb_periods
@@ -24,7 +24,7 @@ class Analysis:
         self.report = Report()
         self.report.store_message(Report.DEBUG,"Analysis {} with :".format(name))
         self.report.store_message(Report.DEBUG,"\t-{} sources".format(len(sources)))
-        self.report.store_message(Report.DEBUG,"\t-{} algorithm".format(algorithm))
+        self.report.store_message(Report.DEBUG,"\t-{} algorithm".format(algorithms))
         self.report.store_message(Report.DEBUG,"\t-{} periods of {} secs".format(nb_periods,period))
         self.report.store_message(Report.DEBUG,"\t-slice of {} secs".format(slice))
         self.report.store_message(Report.DEBUG,"\t-window size of {}".format(window)) 
@@ -50,11 +50,11 @@ class Analysis:
         sources = util.listize(json["sources"])
         del json["sources"]
 
-        if "algorithm" not in json:
-            log.warning("No algorithm specified in analysis part of json")
+        if "algorithms" not in json:
+            log.warning("No algorithms specified in analysis part of json")
             return None
-        algorithm = json["algorithm"]
-        del json["algorithm"]
+        algorithms = json["algorithms"]
+        del json["algorithms"]
 
         if "period" not in json:
             log.warning("No period size specified in analysis part of json")
@@ -85,7 +85,7 @@ class Analysis:
             log.error("Analysis {} has a slice {} greater than its period {}. Invalid parameters.")
             main.cleanup(code = 1)
 
-        return Analysis(name,sources,algorithm,period,nb_periods,slice,window,options)
+        return Analysis(name,sources,algorithms,period,nb_periods,slice,window,options)
         
 
 

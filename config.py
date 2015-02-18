@@ -21,7 +21,11 @@ class Config(object):
     databases = dict()
     sources = dict()
 
-
+    mail = DEFAULT_MAIL = "nicolas.gailly@orange.ch"
+    mail_server = DEFAULT_MAIL_SERVER = "localhost"
+    sms_numbers = DEFAULT_SMS_NUMBERS = ["0787878027"]
+    footer = DEFAULT_FOOTER = "Powered by Orange."
+    
     @classmethod
     def parse_file(klass,file_name):
         """Parse the config file. """
@@ -63,6 +67,7 @@ class Config(object):
         if "analysis" in json:
             noerr = noerr and self.handle_analysis(json["analysis"])
             #log.debug("Analysis dict : {}".format(self.analysis))
+        if "alert" in json: self.handle_alert(json["alert"]) 
         if noerr == True:
             log.info("Config file parsed ... Ok :)")
         else:
@@ -120,12 +125,15 @@ class Config(object):
                     continue
                 a.sources.append(self.sources[source_name])
 
-            if a.algorithm not in globals():
-                noerr = False
-                log.warning("Algorithm {} not recognized. Please lookup in algorithm/__init__.py to see if you import it well".format(a.algorithm))
-                continue
-            ## instantiate the class
-            a.algorithm = globals()[a.algorithm](a,a.options)
+            algos = []
+            for algo in a.algorithms:
+                if algo not in globals():
+                    noerr = False
+                    log.warning("Algorithm {} not recognized. Please lookup in algorithm/__init__.py to see if you import it well".format(algo))
+                    continue
+                ## instantiate the class
+                algos.append(globals()[algo](a,a.options))
+            a.algorithms = algos
             self.analysis[a.name] = a
         return noerr
 
@@ -145,7 +153,15 @@ class Config(object):
             s.table = self.tables[s.table]
             self.sources[s.name] = s
         return noerr
-
+    
+    @classmethod
+    def handle_alert(self,subjson):
+        """Parse and store relevant information regarding the alerting event system"""
+        self.mails = subjson["mails"] if "mails" in subjson else DEFAULT_MAIL
+        self.mail_server = subjson["mail_server"] if "mail_server" in subjson else DEFAULT_MAIL_SERVER
+        self.sms_numbers = subjson["sms_numbers"] if "sms_numbers" in subjson else DEFAULT_SMS_NUMBER
+        self.footer = subjson["footer"] if "footer" in subjson else DEFAULT_FOOTER
+        
 
 import unittest
 

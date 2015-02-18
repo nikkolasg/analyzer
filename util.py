@@ -1,5 +1,6 @@
 import datetime as d
 import logging as log
+import math
 def listize(obj):
     if isinstance(obj,str): return [obj]
     return obj
@@ -20,6 +21,9 @@ def now2str():
     return d.datetime.now().strftime("%Y%m%d%H%M%S")
 
 def pretty(json,text = "JSON",output = "log" ):
+    """Print in a pretty manner the json returned by format (only for one source)
+    You can specify a header text , and the output method (if you specify
+    stg else as 'log' it will be print on the screen"""
     m = log.debug if output == "log" else print
     if isinstance(json,list):
         m("*" * 50)
@@ -42,6 +46,12 @@ def print_data(data,method):
             s = ""
     if not count % 4 == 0: 
         method(s)
+
+
+def isInteger(number):
+    """Return true if this is an integer, false if it is a real number"""
+    return number == math.floor(number)
+
 class Singleton(type):
     instance = None
     def __call__(cls,*args,**kargs):
